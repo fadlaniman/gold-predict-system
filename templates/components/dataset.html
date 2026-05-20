@@ -1,0 +1,81 @@
+<div class="card">
+
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+
+        <div class="card-title">
+            Historical Dataset
+        </div>
+
+        <button id="toggleTableBtn" class="show-btn">
+            Lihat Semua Dataset
+        </button>
+
+    </div>
+
+    <div class="table-container" id="tableContainer">
+
+        {% if data %}
+
+        <table class="data-table">
+
+            <thead>
+                <tr>
+
+                    <!-- KOLOM NOMOR -->
+                    <th>No</th>
+
+                    {% for col in data[0].keys() %}
+                    <th>{{ col }}</th>
+                    {% endfor %}
+
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for row in data | reverse %}
+                <tr>
+
+                    <!-- NOMOR URUT -->
+                    <td>{{ loop.index }}</td>
+
+                    {% for key, value in row.items() %}
+                    <td>
+
+                        <!-- FORMAT TANGGAL -->
+                        {% if key == 'Periode' %}
+
+                        {{ value.strftime('%d-%m-%Y') if value.strftime else value.split(' ')[0] }}
+
+                        <!-- FORMAT KURS & GOLD -->
+                        {% elif key in ['Kurs', 'Gold'] %}
+
+                        {{ "{:,.0f}".format(value).replace(",", ".") }}
+
+                        <!-- FORMAT DESIMAL -->
+                        {% elif key in ['Inflasi', 'Bunga', 'Oil'] %}
+
+                        {{ "{:.2f}".format(value) }}
+
+                        <!-- FORMAT DEFAULT -->
+                        {% else %}
+
+                        {{ value }}
+
+                        {% endif %}
+
+                    </td>
+                    {% endfor %}
+
+                </tr>
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+        {% endif %}
+
+    </div>
+
+</div>

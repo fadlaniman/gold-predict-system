@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Gold Price Prediction Dashboard</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+
+  <body>
+    <div class="dashboard">
+      <!-- HEADER -->
+      {% include 'components/header.html' %}
+
+<!-- =========================
+METRIC SECTION
+========================= -->
+
+{% set latest = data[-1] %}
+{% set is_up = predicted[0] >= latest['Gold'] %}
+{% set change_percent = ((predicted[0] - latest['Gold']) / latest['Gold']) * 100 %}
+{% set highest_row = data | max(attribute='Gold') %}
+{% set lowest_row = data | min(attribute='Gold') %}
+{% set mae = 15205.8567 %}
+{% set mape = 0.8768 %}
+
+<div class="metrics-grid">
+
+  <!-- GOLD PRICE -->
+  <div class="metric-card">
+    <div class="metric-label">Last One Period</div>
+    <div class="metric-value">
+      Rp {{ "{:,.0f}".format(latest['Gold']).replace(",", ".") }}
+    </div>
+    <div class="metric-sub">Per Gram</div>
+  </div>
+
+
+  <!-- FUTURE PREDICT -->
+  <div class="metric-card">
+
+    <div class="metric-label">
+      Forcasted Next Day
+    </div>
+
+    <div 
+      class="metric-value"
+      style="
+        color: {{ '#00C853' if is_up else '#FF3D00' }};
+      "
+    >
+      Rp {{ "{:,.0f}".format(predicted[0]).replace(",", ".") }}
+    </div>
+    
+
+    <div 
+      class="metric-sub"
+      style="
+        color: {{ '#00C853' if is_up else '#FF3D00' }};
+        font-weight:600;
+      "
+    >
+      {% if is_up %}
+        ▲ Rp {{ "{:,.0f}".format(predicted[0] - latest['Gold']).replace(",", ".")}}  ({{ "%.2f"|format(change_percent) }}%)
+      {% else %}
+        ▼ Rp {{ "{:,.0f}".format(latest['Gold'] - predicted[0]).replace(",", ".")}} ({{ "%.2f"|format(change_percent) }}%)
+      {% endif %}
+    </div>
+
+  </div>
+
+
+<div class="metric-card">
+
+    <div class="metric-label">
+        Highest
+    </div>
+
+    <div class="metric-value">
+        Rp {{ "{:,.0f}".format(highest_row['Gold']).replace(",", ".") }}
+    </div>
+
+    <div class="metric-sub">
+        {{ highest_row['Periode'].strftime('%d %B %Y') }}
+    </div>
+
+</div>
+
+
+<div class="metric-card">
+
+    <div class="metric-label">
+        Lowest
+    </div>
+
+    <div class="metric-value">
+        Rp {{ "{:,.0f}".format(lowest_row['Gold']).replace(",", ".") }}
+    </div>
+
+    <div class="metric-sub">
+        {{ lowest_row['Periode'].strftime('%d %B %Y') }}
+    </div>
+
+</div>
+    <!-- Evaluated Model -->
+<div class="metric-card">
+
+  <div class="metric-label">
+    MAE
+  </div>
+
+  <div class="metric-value">
+    Rp {{ "{:,.0f}".format(mae).replace(",", ".") }}
+  </div>
+
+  <div class="metric-sub">
+    MAPE: {{ "%.2f"|format(mape) }}%
+  </div>
+
+</div>
+
+</div>
+
+      <!-- CHART -->
+      <div class="main-grid">
+        <!-- GOLD -->
+        <div class="card">
+          <div class="card-title">Actual vs Forecasted</div>
+
+          <div class="chart-wrap">
+            <canvas id="goldChart"></canvas>
+          </div>
+        </div>
+
+                <div class="card">
+          <div class="card-title">Forecasted Result</div>
+
+          <div class="chart-wrap">
+            <canvas id="forecastChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+       
+
+      <!-- TABLE -->
+      {% include 'components/dataset.html' %}
+
+      <!-- MODEL RESULT
+      <div class="main-grid">
+        
+        
+        FEATURE
+        <div class="card">
+          <div class="card-title">Macroeconomic Features</div>
+          
+          <div class="chart-wrap">
+            <canvas id="featureChart"></canvas>
+          </div>
+        </div>
+
+
+      </div> -->
+      
+
+      <!-- FOOTER -->
+      {% include 'components/footer.html' %}
+    </div>
+    <script>
+
+      window.chartData = {{ data | tojson }};
+      window.predicted = {{ predicted | tojson }}
+      window.historicalPrediction = {{ historical_prediction | tojson }};
+    </script>
+
+    <script src="{{ url_for('static', filename='chart.js') }}"></script>
+  </body>
+</html>
