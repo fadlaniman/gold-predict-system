@@ -1,6 +1,6 @@
 <div class="card">
 
-    <div style="display:flex;justify-content:space-between;align-items:center;">
+    <div class="table-header">
 
         <div class="card-title">
             Historical Dataset
@@ -16,63 +16,68 @@
 
         {% if data %}
 
-        <table class="data-table">
+        <!-- WRAPPER RESPONSIVE -->
+        <div class="table-wrapper">
 
-            <thead>
-                <tr>
+            <table class="data-table">
 
-                    <!-- KOLOM NOMOR -->
-                    <th>No</th>
+                <thead>
+                    <tr>
 
-                    {% for col in data[0].keys() %}
-                    <th>{{ col }}</th>
+                        <!-- KOLOM NOMOR -->
+                        <th>No</th>
+
+                        {% for col in data[0].keys() %}
+                        <th>{{ col }}</th>
+                        {% endfor %}
+
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for row in data | reverse %}
+                    <tr>
+
+                        <!-- NOMOR URUT -->
+                        <td>{{ loop.index }}</td>
+
+                        {% for key, value in row.items() %}
+                        <td>
+
+                            <!-- FORMAT TANGGAL -->
+                            {% if key == 'Periode' %}
+
+                                {{ value.strftime('%d-%m-%Y') if value.strftime else value.split(' ')[0] }}
+
+                            <!-- FORMAT KURS & GOLD -->
+                            {% elif key in ['Kurs', 'Gold'] %}
+
+                                {{ "{:,.0f}".format(value).replace(",", ".") }}
+
+                            <!-- FORMAT DESIMAL -->
+                            {% elif key in ['Inflasi', 'Bunga', 'Oil'] %}
+
+                                {{ "{:.2f}".format(value) }}
+
+                            <!-- FORMAT DEFAULT -->
+                            {% else %}
+
+                                {{ value }}
+
+                            {% endif %}
+
+                        </td>
+                        {% endfor %}
+
+                    </tr>
                     {% endfor %}
 
-                </tr>
-            </thead>
+                </tbody>
 
-            <tbody>
+            </table>
 
-                {% for row in data | reverse %}
-                <tr>
-
-                    <!-- NOMOR URUT -->
-                    <td>{{ loop.index }}</td>
-
-                    {% for key, value in row.items() %}
-                    <td>
-
-                        <!-- FORMAT TANGGAL -->
-                        {% if key == 'Periode' %}
-
-                        {{ value.strftime('%d-%m-%Y') if value.strftime else value.split(' ')[0] }}
-
-                        <!-- FORMAT KURS & GOLD -->
-                        {% elif key in ['Kurs', 'Gold'] %}
-
-                        {{ "{:,.0f}".format(value).replace(",", ".") }}
-
-                        <!-- FORMAT DESIMAL -->
-                        {% elif key in ['Inflasi', 'Bunga', 'Oil'] %}
-
-                        {{ "{:.2f}".format(value) }}
-
-                        <!-- FORMAT DEFAULT -->
-                        {% else %}
-
-                        {{ value }}
-
-                        {% endif %}
-
-                    </td>
-                    {% endfor %}
-
-                </tr>
-                {% endfor %}
-
-            </tbody>
-
-        </table>
+        </div>
 
         {% endif %}
 
