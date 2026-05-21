@@ -36,15 +36,7 @@ const labels = rawData.map(row =>
 
 
 // =====================================
-// DEBUG (PASTIKAN LAST DATE BENAR)
-// =====================================
-
-console.log("LAST RAW DATE:", rawData[rawData.length - 1]['Periode']);
-console.log("LAST LABEL:", labels[labels.length - 1]);
-
-
-// =====================================
-// SAFE ALIGNMENT (ANTI MISSING DATA)
+// SAFE ALIGNMENT
 // =====================================
 
 const minLength = Math.min(
@@ -59,7 +51,7 @@ const safePredicted = predictedGold.slice(-minLength);
 
 
 // =====================================
-// FORECAST LABELS (FUTURE)
+// FORECAST LABELS
 // =====================================
 
 const lastDate =
@@ -120,7 +112,7 @@ new Chart(document.getElementById('goldChart'), {
             // PREDICTED GOLD (DASHED)
             // =================================
             {
-                label: 'Predicted Gold',
+                label: 'Forcasted Gold',
 
                 data: safePredicted,
 
@@ -222,7 +214,7 @@ new Chart(document.getElementById('goldChart'), {
 
 
 // =====================================
-// FORECAST CHART (FUTURE ONLY)
+// FORECAST CHART
 // =====================================
 
 new Chart(document.getElementById('forecastChart'), {
