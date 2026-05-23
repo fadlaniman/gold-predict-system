@@ -3,178 +3,153 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <title>Gold Price Prediction Dashboard</title>
 
+    <!-- Core Scripts & Fonts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-
-    <link
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='style.css') }}"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    
   </head>
 
   <body>
     <div class="dashboard">
-      <!-- HEADER -->
-      {% include 'components/header.html' %}
-
-<!-- =========================
-METRIC SECTION
-========================= -->
-
-{% set latest = data[-1] %}
-{% set is_up = predicted[0] >= latest['Gold'] %}
-{% set change_percent = ((predicted[0] - latest['Gold']) / latest['Gold']) * 100 %}
-{% set highest_row = data | max(attribute='Gold') %}
-{% set lowest_row = data | min(attribute='Gold') %}
-{% set mae = 15205.8567 %}
-{% set mape = 0.8768 %}
-
-<div class="metrics-grid">
-
-  <!-- GOLD PRICE -->
-  <div class="metric-card">
-    <div class="metric-label">Last One Period</div>
-    <div class="metric-value">
-      Rp {{ "{:,.0f}".format(latest['Gold']).replace(",", ".") }}
-    </div>
-    <div class="metric-sub">Per Gram</div>
-  </div>
-
-
-  <!-- FUTURE PREDICT -->
-  <div class="metric-card">
-
-    <div class="metric-label">
-      Forcasted Next Day
-    </div>
-
-    <div 
-      class="metric-value"
-      style="
-        color: {{ '#00C853' if is_up else '#FF3D00' }};
-      "
-    >
-      Rp {{ "{:,.0f}".format(predicted[0]).replace(",", ".") }}
-    </div>
-    
-
-    <div 
-      class="metric-sub"
-      style="
-        color: {{ '#00C853' if is_up else '#FF3D00' }};
-        font-weight:600;
-      "
-    >
-      {% if is_up %}
-        ▲ Rp {{ "{:,.0f}".format(predicted[0] - latest['Gold']).replace(",", ".")}}  ({{ "%.2f"|format(change_percent) }}%)
-      {% else %}
-        ▼ Rp {{ "{:,.0f}".format(latest['Gold'] - predicted[0]).replace(",", ".")}} ({{ "%.2f"|format(change_percent) }}%)
-      {% endif %}
-    </div>
-
-  </div>
-
-
-<div class="metric-card">
-
-    <div class="metric-label">
-        Highest
-    </div>
-
-    <div class="metric-value">
-        Rp {{ "{:,.0f}".format(highest_row['Gold']).replace(",", ".") }}
-    </div>
-
-    <div class="metric-sub">
-        {{ highest_row['Periode'].strftime('%d %B %Y') }}
-    </div>
-
-</div>
-
-
-<div class="metric-card">
-
-    <div class="metric-label">
-        Lowest
-    </div>
-
-    <div class="metric-value">
-        Rp {{ "{:,.0f}".format(lowest_row['Gold']).replace(",", ".") }}
-    </div>
-
-    <div class="metric-sub">
-        {{ lowest_row['Periode'].strftime('%d %B %Y') }}
-    </div>
-
-</div>
-    <!-- Evaluated Model -->
-<div class="metric-card">
-
-  <div class="metric-label">
-    MAE
-  </div>
-
-  <div class="metric-value">
-    Rp {{ "{:,.0f}".format(mae).replace(",", ".") }}
-  </div>
-
-  <div class="metric-sub">
-    MAPE: {{ "%.2f"|format(mape) }}%
-  </div>
-
-</div>
-
-</div>
-
-      <!-- CHART -->
-      <div class="main-grid">
-        <!-- GOLD -->
-        <div class="card">
-          <div class="card-title">Actual vs Forecasted</div>
-
-          <div class="chart-wrap">
-            <canvas id="goldChart"></canvas>
-          </div>
-        </div>
-
-                <div class="card">
-          <div class="card-title">Forecasted Result</div>
-
-          <div class="chart-wrap">
-            <canvas id="forecastChart"></canvas>
-          </div>
-        </div>
-      </div>
-
-       
-
-      <!-- TABLE -->
-      {% include 'components/dataset.html' %}
-
-      <!-- MODEL RESULT -->
-      <div class="main-grid">
-
-        {% include 'components/evaluate.html' %}
-
-      </div>
+      <!-- Header & Logic Setup -->
+      {% include 'components/header.html' %} 
       
+      {% set is_up = predicted[0] >= latest['Gold'] %}
+      {% set change_percent = ((predicted[0] - latest['Gold']) / latest['Gold']) * 100 %} 
+      {% set mae = 15205.8567 %} 
+      {% set mape = 0.8768 %}
 
-      <!-- FOOTER -->
+      <!-- Metrics Cards Section -->
+      <div class="metrics-grid">
+        <!-- Last One Period -->
+        <div class="metric-card">
+          <div class="metric-label">Last One Period</div>
+          <div class="metric-value">Rp {{ "{:,.0f}".format(latest['Gold']).replace(",", ".") }}</div>
+          <div class="metric-sub">
+            {{ latest['Periode'].strftime('%d %B %Y') if latest['Periode'] is not string else latest['Periode'] }}
+          </div>
+        </div>
+
+        <!-- Forecasted Next Day -->
+        <div class="metric-card">
+          <div class="metric-label">Forecasted Next Day</div>
+          <div class="metric-value" style="color: {{ '#00C853' if is_up else '#FF3D00' }};">
+            Rp {{ "{:,.0f}".format(predicted[0]).replace(",", ".") }}
+          </div>
+          <div class="metric-sub" style="color: {{ '#00C853' if is_up else '#FF3D00' }};">
+            {% if is_up %} 
+              ▲ Rp {{ "{:,.0f}".format(predicted[0] - latest['Gold']).replace(",", ".") }} ({{ "%.2f"|format(change_percent) }}%) 
+            {% else %} 
+              ▼ Rp {{ "{:,.0f}".format(latest['Gold'] - predicted[0]).replace(",", ".") }} ({{ "%.2f"|format(change_percent) }}%) 
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Highest All Time -->
+        <div class="metric-card">
+          <div class="metric-label">Highest (All Time)</div>
+          <div class="metric-value">Rp {{ "{:,.0f}".format(highest['Gold']).replace(",", ".") }}</div>
+          <div class="metric-sub">
+            {{ highest['Periode'].strftime('%d %B %Y') if highest['Periode'] is not string else highest['Periode'] }}
+          </div>
+        </div>
+
+        <!-- Lowest All Time -->
+        <div class="metric-card">
+          <div class="metric-label">Lowest (All Time)</div>
+          <div class="metric-value">Rp {{ "{:,.0f}".format(lowest['Gold']).replace(",", ".") }}</div>
+          <div class="metric-sub">
+            {{ lowest['Periode'].strftime('%d %B %Y') if lowest['Periode'] is not string else lowest['Periode'] }}
+          </div>
+        </div>
+
+        <!-- MAE & MAPE -->
+        <div class="metric-card">
+          <div class="metric-label">MAE</div>
+          <div class="metric-value">Rp {{ "{:,.0f}".format(mae).replace(",", ".") }}</div>
+          <div class="metric-sub">MAPE: {{ "%.2f"|format(mape) }}%</div>
+        </div>
+      </div>
+
+      <!-- Notifications / Alerts -->
+      {% if success_message %}
+      <div class="success-alert" id="successBox">
+        <div class="success-title">Forecast Success</div>
+        <div class="success-text">{{ success_message }}</div>
+      </div>
+      {% endif %} 
+      
+      {% if error_message %}
+      <div class="error-alert" id="errorBox">
+        <div class="error-title">Upload Failed</div>
+        <div class="error-text">{{ error_message }}</div>
+      </div>
+      {% endif %}
+
+      <!-- Form Upload Section -->
+      <div class="card prediction-card">
+        <div class="prediction-header">
+          <div>
+            <div class="card-title">Predict Gold Price</div>
+            <div class="prediction-desc">Upload dataset in CSV or Excel format to generate forecasting results.</div>
+          </div>
+          <div class="prediction-badge">AI Forecast</div>
+        </div>
+
+        <form action="/" method="POST" enctype="multipart/form-data" class="prediction-form">
+          <div class="upload-area">
+            <input type="file" name="file" id="fileInput" accept=".csv,.xlsx,.xls" required />
+            <label for="fileInput" class="upload-label">
+              <div class="upload-glow"></div>
+              <div class="upload-content">
+                <div class="upload-icon">⬆</div>
+                <div class="upload-text">Drag & Drop File Here</div>
+                <div class="upload-subtext">or click to browse CSV / XLSX file</div>
+                <div class="upload-format">Shape Required : (1 × 30 × 5)</div>
+              </div>
+            </label>
+          </div>
+          <button type="submit" class="predict-btn" id="predictBtn" disabled>
+            <span> Generate Prediction </span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Charts Section -->
+      <div class="main-grid">
+        <div class="card">
+          <div class="card-title">Actual vs Forecasted (Historical Dataset)</div>
+          <div class="chart-wrap"><canvas id="goldChart"></canvas></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Forecasted Result</div>
+          <div class="chart-wrap"><canvas id="forecastChart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Sub-Components Includes -->
+      {% include 'components/dataset.html' %} 
+      {% include 'components/evaluate.html' %} 
       {% include 'components/footer.html' %}
     </div>
-    <script>
 
-      window.chartData = {{ data | tojson }};
-      window.predicted = {{ predicted | tojson }}
-      window.historicalPrediction = {{ historical_prediction | tojson }};
+    <!-- Bridge Data dari Flask ke JavaScript Eksternal -->
+    <script>
+      window.flaskData = {
+        activeData: {{ data | tojson }},
+        historicalChartData: {{ historical_chart_data | tojson }},
+        predicted: {{ predicted | tojson }},
+        historicalPrediction: {{ historical_prediction | tojson }},
+        activeLastRow: {{ active_last_row | tojson }}
+      };
     </script>
 
-    <script src="{{ url_for('static', filename='chart.js') }}"></script>
+    <!-- File JavaScript Pendukung Eksternal -->
+    <script src="{{ url_for('static', filename='js/upload-handler.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/chart.js') }}"></script>
   </body>
 </html>

@@ -1,0 +1,37 @@
+:root {
+    --gold: #C9A84C;
+    --gold-light: #F0D080;
+    --obsidian: #0D0D0D;
+    --charcoal: #1A1A1A;
+    --slate: #2A2A2A;
+    --text: #E8E0CC;
+    --text-secondary: #A89878;
+    --green: #3DAA78;
+    --border: rgba(201, 168, 76, 0.18);
+    --radius: 10px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background: var(--obsidian);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    padding: 2rem;
+    overflow-x: hidden;
+}
+
+@media(max-width: 1000px) {
+    body { padding: 1.2rem; }
+}
+@media(max-width: 600px) {
+    body { padding: 1rem; }
+}
