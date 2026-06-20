@@ -1,4 +1,3 @@
-# core/data_cleaner.py
 import pandas as pd
 
 def clean_and_format_data(df):
@@ -11,19 +10,17 @@ def clean_and_format_data(df):
     
     for col in numeric_cols:
         if col in df_clean.columns:
-            # 1. Pastikan tipe datanya string agar bisa dimanipulasi teksnya
+
             df_clean[col] = df_clean[col].astype(str)
             
             # 2. Hapus simbol mata uang dan spasi kosong
             df_clean[col] = df_clean[col].str.replace('Rp', '', regex=False)
-            df_clean[col] = df_clean[col].str.replace(' ', '', regex=False)
-            
-            # 3. Handle penulisan desimal koma (Format ID) vs desimal titik (Format EN)
+            df_clean[col] = df_clean[col].str.replace(' ', '', regex=False)       
+
             if df_clean[col].str.contains(',').any():
-                df_clean[col] = df_clean[col].str.replace('.', '', regex=False)  # Hapus titik ribuan
-                df_clean[col] = df_clean[col].str.replace(',', '.', regex=False)  # Koma jadi titik desimal
+                df_clean[col] = df_clean[col].str.replace('.', '', regex=False)
+                df_clean[col] = df_clean[col].str.replace(',', '.', regex=False)
             
-            # 4. Cast menjadi numeric float
             df_clean[col] = pd.to_numeric(df_clean[col], errors='coerce')
             
     return df_clean

@@ -1,10 +1,7 @@
 import numpy as np
 
 def create_lstm_sequences(X_scaled, y_scaled, n_steps):
-    """
-    Mengubah array 2D terstandardisasi menjadi struktur sekuens 3D 
-    yang dibutuhkan sebagai input lapisan LSTM Keras.
-    """
+
     X_seq = []
     y_seq = []
     

@@ -1,10 +1,8 @@
-# core/predictor.py
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 from tensorflow.keras.models import load_model
 
-# Impor komponen modular yang sudah kita pisahkan tadi
 from core.data_cleaner import clean_and_format_data
 from core.sequence_helper import create_lstm_sequences
 
@@ -16,16 +14,13 @@ class GoldPredictor:
         self.sheet_name = sheet_name
         self.n_steps = n_steps
 
-        # LOAD MODEL & SCALERS
         self.model = load_model(self.model_path)
         self.scaler_X = MinMaxScaler()
         self.scaler_y = MinMaxScaler()
 
-        # STATE MANAGEMENTS
         self.forecast_scaled_input = None
         self.active_df = None
 
-        # BOOTSTRAP DATA LOADING
         self.load_data()
         self.prepare()
 
@@ -38,7 +33,6 @@ class GoldPredictor:
 
         df['Periode'] = pd.to_datetime(df['Periode'], dayfirst=True, errors='coerce')
         
-        # Eksekusi fungsi eksternal pembersih data
         df = clean_and_format_data(df)
         
         df = df.sort_values(by='Periode').set_index('Periode')
@@ -56,7 +50,6 @@ class GoldPredictor:
         if self.X_scaled.shape[0] <= self.n_steps:
             raise ValueError(f"Baris data ({self.X_scaled.shape[0]}) terlalu sedikit. Butuh > {self.n_steps}.")
         
-        # Eksekusi fungsi eksternal pembuat sekuens LSTM
         self.X_seq, self.y_seq = create_lstm_sequences(self.X_scaled, self.y_scaled, self.n_steps)
 
     def predict_all(self):
@@ -75,8 +68,7 @@ class GoldPredictor:
         
         df_new.columns = df_new.columns.str.strip()
         df_new['Periode'] = pd.to_datetime(df_new['Periode'], dayfirst=True, errors='coerce')
-        
-        # Eksekusi pembersihan data upload
+
         df_new = clean_and_format_data(df_new)
         df_new = df_new.sort_values('Periode').set_index('Periode')
 
