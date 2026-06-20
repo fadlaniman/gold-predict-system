@@ -13,7 +13,6 @@ def clean_and_format_data(df):
 
             df_clean[col] = df_clean[col].astype(str)
             
-            # 2. Hapus simbol mata uang dan spasi kosong
             df_clean[col] = df_clean[col].str.replace('Rp', '', regex=False)
             df_clean[col] = df_clean[col].str.replace(' ', '', regex=False)       
 

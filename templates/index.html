@@ -14,7 +14,7 @@
 
   <body>
     <div class="dashboard">
-      <!-- Header & Logic Setup -->
+      <!-- Header-->
       {% include 'components/header.html' %} 
       
       {% set is_up = predicted[0] >= latest['Gold'] %}
@@ -137,7 +137,6 @@
       {% include 'components/footer.html' %}
     </div>
 
-    <!-- Bridge Data dari Flask ke JavaScript Eksternal -->
     <script>
       window.flaskData = {
         activeData: {{ data | tojson }},
@@ -148,7 +147,6 @@
       };
     </script>
 
-    <!-- File JavaScript Pendukung Eksternal -->
     <script src="{{ url_for('static', filename='js/upload-handler.js') }}"></script>
     <script src="{{ url_for('static', filename='js/chart.js') }}"></script>
   </body>
